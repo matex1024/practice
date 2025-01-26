@@ -1,7 +1,7 @@
 services:
-  boilerplate-database:
-    image: postgres:16
-    container_name: boilerplate-database
+  postgredb:
+    image: postgres:17
+    container_name: postgredb
     env_file:
       - symfony/.env
     restart: always
@@ -13,25 +13,25 @@ services:
     volumes:
       - database_data:/var/lib/postgresql/data:rw
 
-  boilerplate-app:
+  app:
     env_file:
       - symfony/.env
-    container_name: boilerplate-app
+    container_name: app
     build:
       context: ./
       dockerfile: docker/api/Dockerfile
       target: frankenphp_dev
     depends_on:
-      - boilerplate-database
-    image: ${IMAGES_PREFIX:-}boilerplate-app
+      - postgredb
+    image: ${IMAGES_PREFIX:-}app
     restart: unless-stopped
     environment:
-      SERVER_NAME: ${SERVER_NAME:-http://localhost}, boilerplate-app:80
+      SERVER_NAME: ${SERVER_NAME:-http://localhost}, app:80
       MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
       MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
       TRUSTED_HOSTS: ${TRUSTED_HOSTS:-^${SERVER_NAME:-nbonnici\.info|localhost}|php$$}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@database:5432/${POSTGRES_DB:-app}?serverVersion=${POSTGRES_VERSION:-16}&charset=${POSTGRES_CHARSET:-utf8}
+      DATABASE_URL: postgresql://postgres:password@postgredb:5432/postgredb
       MERCURE_URL: ${CADDY_MERCURE_URL:-http://php/.well-known/mercure}
       MERCURE_PUBLIC_URL: ${CADDY_MERCURE_PUBLIC_URL:-http://${SERVER_NAME:-localhost}/.well-known/mercure}
       MERCURE_JWT_SECRET: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
@@ -41,11 +41,6 @@ services:
       - caddy_config:/config
     # comment the following line in production, it allows to have nice human-readable logs in dev
     tty: true
-
-networks:
-  default:
-    external: true
-    name: proxies
 
 volumes:
   database_data:

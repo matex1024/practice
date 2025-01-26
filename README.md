@@ -1,61 +1,27 @@
 ### Setup
-Install Docker and php locally first, then copy `symfony/.env.dist` to `symfony/.env` and edit to your needs.
-
-Then to setup project's containers simply run:
+uruchomienie projektu
 
 ```bash
-composer setup
+docker compose --env-file symfony/.env up -d --build
 ```
-
-Your API is up and ready on [http://localhost](http://localhost) and [https://localhost](https://localhost) with a self signed certificate.
-
-### Usage
-
-Once built, you can start or stop project's containers like this:
+Migracja
 
 ```bash
-composer up
+docker exec -it app  bin/console doctrine:migration:migrate 
 ```
-
+załadowanie danych testowych 
 ```bash
-composer stop
+docker exec -it app  bin/console doctrine:fixtures:load
 ```
 
-Destroys containers (but keep volumes)
-
+sprawdzenie api
 ```bash
-composer down
+http://localhost/api/v1/reports
 ```
 
-Migrate database
-
+uruchomienie frontendu
 ```bash
-composer migrate
+cd frontend
+npm install
+ng serve
 ```
-
-Load fixtures
-
-```bash
-composer fixtures
-```
-
-Connect to postgresql database
-
-```bash
-composer db
-```
-
-Show logs
-
-```bash
-composer logs
-```
-
-Fix code lint
-
-```bash
-composer lint:fix
-```
-
-See [composer configuration file](./composer.json) for more available scripts.
-
