@@ -32,7 +32,7 @@ class ReportRepository extends ServiceEntityRepository
         array $orderBy = ['room' => 'DESC', 'date_time' => 'DESC'], 
         ?int $limit = null, 
         ?int $offset = null
-    ): array  {
+    ): array {
         $qb = $this->createQueryBuilder('r');
         // Apply filters
         $this->applyFilters($qb, $filters);

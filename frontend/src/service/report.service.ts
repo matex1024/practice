@@ -1,16 +1,27 @@
-import { Injectable } from '@angular/core';
-import { Report } from '@/domain/report';
-@Injectable()
-export class ReportService {
-    getReportData() : Report[] {
-        return [
-            { name: 'Test 1', date: '2025-01-01', time: '10:00', user: 'User A', room: 'Pokoj 1' },
-            { name: 'Test 2', date: '2025-01-02', time: '11:00', user: 'User B', room: 'Pokoj 3' },
-            { name: 'Test 3', date: '2025-01-03', time: '13:00', user: 'User C', room: 'Pokoj 2' },
-        ];
-    }
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient , HttpParams} from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-    getReport(): Promise<Report[]> {
-        return Promise.resolve(this.getReportData());
-    }
+import { API_URL, Report } from '../domain/report';
+
+@Injectable({ providedIn: 'root' })
+export class ReportService {
+  #http = inject(HttpClient);
+  #response = signal<Report[] | null>(null);
+
+  get reports() {
+    return this.#response.asReadonly();
+  }
+
+  fetchReports(dateFrom?: string, dateTo?: string, room?: string):void {
+    let params = new HttpParams();
+    if (dateFrom) params = params.set('date_from', dateFrom);
+    if (dateTo) params = params.set('date_to', dateTo);
+    if (room) params = params.set('room', room);
+
+    this.#http.get<Report[]>(API_URL, { params }).subscribe({
+      next: (data) => this.#response.set(data),
+      error: (err) => console.error('Error fetching reports:', err),
+    });
+  }
 }

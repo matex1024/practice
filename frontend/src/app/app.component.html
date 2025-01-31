@@ -9,9 +9,13 @@
         <label for="date_to">Do</label>
     </p-floatlabel>
     <p-floatlabel class="w-full md:w-56" variant="on">
-      <p-dropdown [(ngModel)]="room" inputId="room" [options]="rooms" optionLabel="room" styleClass="w-full" />
+      <p-dropdown [(ngModel)]="room"
+      inputId="room"
+      [options]="roomOptions"
+      placeholder="Select Room" />
       <label for="room">Lokal</label>
     </p-floatlabel>
+    <button (click)="fetchReports()">Zatwierdź</button>
   </ng-template>
   <ng-template pTemplate="panel">
     <p-table

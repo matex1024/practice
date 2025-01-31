@@ -26,21 +26,19 @@ final class ReportController extends AbstractController
         EntityManagerInterface $entityManager
     ): JsonResponse {
         $reportRepository = $entityManager->getRepository(Report::class);
-        // $page = $request->query->getInt('page', 1);
-        // $limit = $request->query->getInt('limit', 10);
-        // $offset = ($page - 1) * $limit;
+        $dateFrom = $request->query->get('date_from');
+        $dateTo = $request->query->get('date_to');
+        $room = $request->query->get('room');
 
-        $parameters = json_decode($request->getContent(), true);
-        $filters = [
-            'date_from' => $parameters['date_from']??null,
-            'date_to' => $parameters['date_to']??null,
-            'room' => $parameters['room']??null,
-        ];
 
-        $reports = $reportRepository->findAll(
-            array_filter($filters), 
-            ['room' => 'DESC', 'date_time' => 'DESC'],
-        );
+        if (!isset($dateFrom) && isset($dateTo) && isset($room)) {
+            $reports = $this->getDummyData();
+        } else {
+            $reports = $reportRepository->findAll(
+                ['date_from' => $dateFrom, 'date_to' => $dateTo, 'room' => $room], 
+                ['room' => 'DESC', 'date_time' => 'DESC'],
+            );
+        }
 
         if (!$reports) {
             throw $this->createNotFoundException(
@@ -49,5 +47,33 @@ final class ReportController extends AbstractController
         }
 
         return $this->json($reports);
+    }
+
+
+    private function getDummyData(): array
+    {
+        return [
+            [
+                'id' => 1,
+                'room' => '101',
+                'date_time' => '2023-10-01 10:00:00+00',
+                'name' => 'report 1',
+                'user_name' => 'user 1',
+            ],
+            [
+                'id' => 2,
+                'room' => '102',
+                'date_time' => '2023-10-02 11:00:00+00',
+                'name' => 'report 2',
+                'user_name' => 'user 2',
+            ],
+            [
+                'id' => 3,
+                'room' => '103',
+                'date_time' => '2023-10-03 12:00:00+00',
+                'name' => 'report 3',
+                'user_name' => 'user 3',
+            ],
+        ];
     }
 }
