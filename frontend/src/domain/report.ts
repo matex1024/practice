@@ -6,3 +6,4 @@ export type Report = {
     user: string;
     room: string;
 }
+export interface Room { label: string; value: string }

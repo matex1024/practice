@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, computed, inject, resource, Signal,signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { PanelMenuModule } from 'primeng/panelmenu';
@@ -8,7 +8,7 @@ import { SelectModule } from 'primeng/select';
 import { SplitterModule } from 'primeng/splitter';
 import { DatePickerModule } from 'primeng/datepicker';
 import { FloatLabelModule } from 'primeng/floatlabel';
-
+import { Room } from '../domain/report';
 import { ReportService } from '../service/report.service';
 
 @Component({
@@ -24,7 +24,8 @@ export class AppComponent {
   room: string | null = null;
   reportService = inject(ReportService);
   reports = this.reportService.reports || [];
-  roomOptions: { label: string; value: string }[] = [];
+  roomOptions: Room[] = [];
+  selectedRoom?: Room | null = null;
 
   fetchReports(): void {
     const dateFromStr = this.dateFrom ? this.dateFrom.toISOString().split('T')[0] : '';
@@ -33,13 +34,14 @@ export class AppComponent {
   }
 
   getRoomOptions() {
+    let options: Room[] = [];
     for(let i =1; i<=10; i++){
-      this.roomOptions.push({label: 'pokoj-'+i, value: 'pokoj '+i});
+      options.push({label: 'pokoj '+i, value: 'pokoj-'+i});
     }
+    return options;
   }
 
   ngOnInit(): void {
     this.reportService.fetchReports();
-    this.getRoomOptions();
   }
 }
